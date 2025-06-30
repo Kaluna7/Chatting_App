@@ -1,48 +1,96 @@
+import { useState } from 'react'
 import ceoImg from '../../assets/images/ceo.png'
-import { useNavigate } from 'react-router-dom';
-
-
+import { useNavigate } from 'react-router-dom'
+import axios from 'axios'
 
 export default function Login() {
-    const navigate = useNavigate();
+  const navigate = useNavigate()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
 
-    const handleRegister = () => {
-        navigate('/register');
-}
+  const handleRegisterNav = () => {
+    navigate('/register')
+  }
 
-
+  const handleLogin = async (e) => {
+    e.preventDefault()
+    setError('')
+    try {
+      const res = await axios.post('http://127.0.0.1:9000/api/auth/login/', {
+        username: email,   // atau sesuaikan jika backend pakai field 'email'
+        password
+      })
+      // simpan token
+      localStorage.setItem('accessToken', res.data.access)
+      // redirect ke dashboard
+      navigate('/dashboard')
+    } catch (err) {
+      console.error(err)
+      setError('Login gagal, periksa email & password.')
+    }
+  }
 
   return (
-    <div className="flex flex-row h-screen justify-center items-center bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#525252] via-[#a3a3a3] to-[#e5e5e5]">
-      <div className="shadow-2xl shadow-neutral-300/100 w-[90%] h-[90%] relative overflow-hidden rounded-2xl bg-gradient-to-r from-transparent via-transparent to-blue-200">
-        <img 
-          src={ceoImg} 
-          className="absolute left-0 top-0 h-full w-1/2 object-cover" 
+    <div className="flex h-screen items-center justify-center bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-[#525252] via-[#a3a3a3] to-[#e5e5e5]">
+      <div className="relative flex w-[90%] h-[90%] overflow-hidden rounded-2xl bg-gradient-to-r from-transparent via-transparent to-blue-200 shadow-2xl shadow-neutral-300">
+        <img
+          src={ceoImg}
           alt="CEO"
+          className="absolute left-0 top-0 h-full w-1/2 object-cover"
         />
-        <div className="absolute right-0 top-0 w-1/2 h-full flex flex-row p-10">
-          <div className='flex flex-col w-full rounded-2xl items-center justify-center gap-6 bg-white shadow-2xl shadow-blue-400/100'>
-            <h1 className='font-bold text-[40px]'>Login</h1>
-            <section className='flex flex-col gap-6 font-bold'>
-                <label>
-                    Email <br/>
-                    <input className='border-1 rounded-lg h-[35px] w-[300px] border-slate-400/100' />
-                </label>
-                 <label>
-                    Password <br/>
-                    <input className='border-1 rounded-lg h-[35px] w-[300px] border-slate-400/100' />
-                </label>
-            </section>
-            <a href='' className='bg-purple-400 rounded-2xl p-2 px-5 font-bold text-white'>Register</a>
-            <div className="flex flex-col text-center gap-5 mt-[50px]">
-                <p>Already have an account ?</p>
-                <a onClick={handleRegister} className='hover:text-blue-500 cursor-pointer'>Login</a>
-                
-            </div>
+
+        <form
+          onSubmit={handleLogin}
+          className="absolute right-0 top-0 flex h-full w-1/2 flex-col items-center justify-center gap-6 bg-white p-10 shadow-2xl shadow-blue-400"
+        >
+          <h1 className="text-[40px] font-bold">Login</h1>
+
+          <div className="flex w-full flex-col gap-4 font-bold">
+            <label className="flex flex-col">
+              Email
+              <input
+                type="email"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                className="mt-1 h-[35px] w-full rounded-lg border border-slate-400 px-2"
+                required
+              />
+            </label>
+
+            <label className="flex flex-col">
+              Password
+              <input
+                type="password"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="mt-1 h-[35px] w-full rounded-lg border border-slate-400 px-2"
+                required
+              />
+            </label>
           </div>
-        </div>
+
+          {error && (
+            <p className="text-sm text-red-500">{error}</p>
+          )}
+
+          <div className="flex w-full justify-between mt-4">
+            <button
+              type="button"
+              onClick={handleRegisterNav}
+              className="rounded-2xl bg-purple-400 px-5 py-2 font-bold text-white hover:bg-purple-500"
+            >
+              Register
+            </button>
+            <button
+              type="submit"
+              className="rounded-2xl bg-blue-400 px-5 py-2 font-bold text-white hover:bg-blue-500"
+            >
+              Login
+            </button>
+          </div>
+        </form>
       </div>
     </div>
-  );
+  )
 }
-

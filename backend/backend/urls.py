@@ -1,9 +1,7 @@
-from django.urls import path
-from django.http import JsonResponse
-
-def hello(request):
-    return JsonResponse({'message': 'Hello from Django API!'})
+from django.contrib import admin
+from django.urls import path, include
 
 urlpatterns = [
-    path('', hello),
+    path('admin/', admin.site.urls),
+    path('api/auth/', include('accounts.urls')),  # /api/auth/register/ & /api/auth/login/
 ]
