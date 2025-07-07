@@ -3,31 +3,39 @@ import ceoImg from '../../assets/images/ceo.png'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios'
 
+const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:9000'
+
 export default function Login() {
   const navigate = useNavigate()
-  const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
 
-  const handleRegisterNav = () => {
-    navigate('/register')
-  }
+  const handleRegisterNav = () => navigate('/register')
 
   const handleLogin = async (e) => {
     e.preventDefault()
     setError('')
+    setLoading(true)
     try {
-      const res = await axios.post('http://127.0.0.1:9000/api/auth/login/', {
-        username: email,   // atau sesuaikan jika backend pakai field 'email'
+      const res = await axios.post(`${API_BASE}/api/auth/login/`, {
+        username,
         password
       })
-      // simpan token
-      localStorage.setItem('accessToken', res.data.access)
-      // redirect ke dashboard
+
+      // simpan token ke localStorage kalau backend pakai JWT
+      if (res.data.access) {
+        localStorage.setItem('accessToken', res.data.access)
+      }
+
       navigate('/dashboard')
     } catch (err) {
       console.error(err)
-      setError('Login gagal, periksa email & password.')
+      const msg = err.response?.data?.message || 'Login gagal. Cek username & password.'
+      setError(msg)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -48,11 +56,11 @@ export default function Login() {
 
           <div className="flex w-full flex-col gap-4 font-bold">
             <label className="flex flex-col">
-              Email
+              Username
               <input
-                type="email"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
+                type="text"
+                value={username}
+                onChange={e => setUsername(e.target.value)}
                 className="mt-1 h-[35px] w-full rounded-lg border border-slate-400 px-2"
                 required
               />
@@ -71,7 +79,7 @@ export default function Login() {
           </div>
 
           {error && (
-            <p className="text-sm text-red-500">{error}</p>
+            <p className="text-sm text-red-500 text-center whitespace-pre-wrap">{error}</p>
           )}
 
           <div className="flex w-full justify-between mt-4">
@@ -79,14 +87,20 @@ export default function Login() {
               type="button"
               onClick={handleRegisterNav}
               className="rounded-2xl bg-purple-400 px-5 py-2 font-bold text-white hover:bg-purple-500"
+              disabled={loading}
             >
               Register
             </button>
             <button
               type="submit"
-              className="rounded-2xl bg-blue-400 px-5 py-2 font-bold text-white hover:bg-blue-500"
+              className={`rounded-2xl px-5 py-2 font-bold text-white ${
+                loading
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-blue-400 hover:bg-blue-500'
+              }`}
+              disabled={loading}
             >
-              Login
+              {loading ? 'Logging in...' : 'Login'}
             </button>
           </div>
         </form>

@@ -26,7 +26,7 @@ ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
 # Application definition
 INSTALLED_APPS = [
-    'corsheaders',                # must come before CommonMiddleware
+    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -35,13 +35,13 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
-    'channels',                   # Django Channels for WebSocket support
+    'channels',
 
-    # Project apps
-    'api',
     'accounts',
-    'chat',                       # Chat app
+    'chat',
 ]
+
+AUTH_USER_MODEL = 'accounts.CustomUser'
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',  # must be first
@@ -73,18 +73,24 @@ TEMPLATES = [
 ]
 
 # ASGI application (Channels)
-ASGI_APPLICATION = "backend.asgi.application"
+ASGI_APPLICATION = 'backend.asgi.application'
 
 
 # Channel layers (Redis)
 # settings.py
 CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('127.0.0.1', 6379)],
+        },
     },
 }
 
 
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+]
 # Database
 DATABASES = {
     'default': {
@@ -96,6 +102,8 @@ DATABASES = {
         'PORT': '5432',
     }
 }
+
+TIME_ZONE = 'Asia/Jakarta'
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [

@@ -12,7 +12,6 @@ const ChatDashboard = () => {
   const contacts = [
     { id: 1, name: 'Kaluna', lastSeen: 'Online', unread: 0, avatar: 'K' },
     { id: 2, name: 'Dahesa', lastSeen: '2 jam lalu', unread: 1, avatar: 'D' },
-    { id: 2, name: 'Toni', lastSeen: 'Online', unread: 1, avatar: 'D' },
   ];
 
   const getRoomName = (contactId) => {
@@ -21,7 +20,8 @@ const ChatDashboard = () => {
 
   const connectWebSocket = (contactId) => {
     const roomName = getRoomName(contactId);
-    const wsUrl = `ws://127.0.0.1:9001/ws/chat/${roomName}/`;
+    const wsUrl = `ws://127.0.0.1:9000/ws/chat/${roomName}/`;
+
 
 
 
